@@ -1,0 +1,2 @@
+installing @react-oauth/google, axios, react-router-dom
+installing appwrite
