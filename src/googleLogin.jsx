@@ -9,14 +9,16 @@ const GoogleLogin = () => {
     }, []); 
     const responseGoogle = async (authResult) => { 
         try {
-            console.log('Google auth result:', authResult);
+            console.log('Google auth result give by googleAuthServer, recieved by React frontend:', authResult);
             if( authResult['code']){
-                console.log('Auth code received:', authResult['code']);
+              //  console.log('Auth code received:', authResult['code']);
                 const result = await googleAuth(authResult['code']); // this method calls the express server {googleAuth}
                 console.log('Backend response:', result.data); 
-                const {email, name , image} = result.data.data.user;
+                const {email, name} = result.data.user;
                
                 // TODO: Store user data and redirect to dashboard
+            }else{ 
+                console.log("authResult['code'] not found ")
             }
         } catch (error) {
             console.error("Google auth failed:", error);
@@ -33,7 +35,7 @@ const GoogleLogin = () => {
     const googleLogin = useGoogleLogin({
         onSuccess: responseGoogle, 
         onError: handleGoogleError,
-        flow: 'implicit', // Changed from auth-code to implicit
+        flow: 'auth-code', // Changed from auth-code to implicit
         scope: 'openid email profile',
         ux_mode: 'popup',
         select_account: true
