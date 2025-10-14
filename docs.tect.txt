@@ -1,2 +1,8 @@
 installing @react-oauth/google, axios, react-router-dom
 installing appwrite
+
+-we'll implement storing jwt in localstorage for now , we'll verify the jwt 
+
+
+-we'll later verify the jwt form react-redux state
+

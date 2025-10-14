@@ -8,9 +8,9 @@ export const PageNotFound = () =>{
             <h2>
                 404 page not found </h2> 
                 <button onClick ={ () => { 
-                    navigate("/login")
+                    navigate("/")
                 }}> 
-                    take me to login page
+                    take me to LandingPage
                      </button>
         </div> 
         </>

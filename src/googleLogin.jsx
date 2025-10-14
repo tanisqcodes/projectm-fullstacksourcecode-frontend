@@ -1,12 +1,33 @@
-import React, { useEffect } from "react"
+import React, { useEffect,useState } from "react"
 import {useGoogleLogin} from '@react-oauth/google'
 import { googleAuth } from './api.js'
+// when you do google login , your jwt is set to local storage
+import {useNavigate }from "react-router-dom"
+
+
 const GoogleLogin = () => {
+    const navigate = useNavigate()
+    const [token, setToken ] = useState("")
     
     useEffect(() => {
         console.log('GoogleLogin component mounted');
-        console.log('Google OAuth Client ID:', '208828013989-ck6dh4abrj8melq3g76nufjkoc31l159.apps.googleusercontent.com');
+       
     }, []); 
+
+    useEffect(() => {
+        if(token){ 
+            localStorage.setItem("projectMJWT", token )
+
+        }
+        
+    },[token])
+    useEffect(() => {
+
+     } ,[])
+
+
+
+
     const responseGoogle = async (authResult) => { 
         try {
             console.log('Google auth result give by googleAuthServer, recieved by React frontend:', authResult);
@@ -15,8 +36,26 @@ const GoogleLogin = () => {
                 const result = await googleAuth(authResult['code']); // this method calls the express server {googleAuth}
                 console.log('Backend response:', result.data); 
                 const {email, name} = result.data.user;
+                setToken( result.data.token ) 
+                navigate(`/user/practice/sat`)
+
+
+                
+                
                
-                // TODO: Store user data and redirect to dashboard
+
+
+
+
+
+
+                // TODO: Store user data and redirect to dashboard 
+                // result.data is backend response,  it has jwt token , authenticated user details ,{ _id, email} ,
+                //  _id is from mongodb document for each user
+                // email is primary key in socials-login mongodb collection for users
+                //each jwt is payloaded with _id and email 
+
+
             }else{ 
                 console.log("authResult['code'] not found ")
             }
@@ -40,6 +79,7 @@ const GoogleLogin = () => {
         ux_mode: 'popup',
         select_account: true
     })
+
     return ( <>
     <div className = 'App'> 
         <button onClick = {googleLogin}>

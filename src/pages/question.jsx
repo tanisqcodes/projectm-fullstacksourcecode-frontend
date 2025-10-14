@@ -2,11 +2,30 @@ import React, {useState, useEffect} from "react"
 import axios from "axios"
 import {Client , Storage} from "appwrite"
 const projectId = import.meta.env.VITE_PROJECT_ID
+const bucketid = import.meta.env.VITE_SATMATHKAPLAN_BUCKET_ID
+
+import {useParams } from "react-router-dom"
 export const Question = () => { 
+
+  const { chapter , question } = useParams()
+  
+
     // only questions which are mcq will render in this
      const client = new Client().setEndpoint("https://nyc.cloud.appwrite.io/v1")
-     .setProject("689a3278003571660e5b")
-     const storage = new Storage(client)
+     .setProject(projectId)
+     const storage = new Storage(client)  
+
+
+     // this page uses the chapterNumber and questionNumber and sends it to 
+     // express server which fetches the whole questionObject and then sends it to frontend
+     // and then we have questionObject in frontend but
+     // frontend fetches the image urls and render them in frontend , 
+     // i could have also fetched image urls in backend and sent them in questionObject , 
+     // dumb me , my first project
+
+     // todo: , should i use useeffect to set parameters in their state : |_|
+     
+
      
 
 
@@ -28,15 +47,15 @@ export const Question = () => {
 
 
 
-
+     
      const [questionReceived , setQuestionReceived] = useState("false") // if questionReceived is false , then we 
      // can show loading else we can render question
 
 
     
     
-    const [chapterNumber, setChapterNumber] = useState("chapter 2")  // these values will come from user
-    const [questionNumber , setQuestionNumber] = useState("3") // will come from user
+    const [chapterNumber, setChapterNumber] = useState("")  // these values will come from user
+    const [questionNumber , setQuestionNumber] = useState("") // will come from user
     const [topic, setTopic ] = useState("")
     const [subtopic , setSubtopic] = useState("")
     const [level , setLevel ] = useState("")
@@ -54,6 +73,14 @@ const [answerImageUrl, setAnswerImageUrl] =useState("") // states for urls
 const [questionImageUrl, setQuestionImageUrl] = useState("") // states for urls 
 
 
+
+const handleChapterNumber = (love) => { 
+  setChapterNumber(love)
+}
+const handleQuestionNumber= (love) => { 
+  setQuestionNumber(love)
+
+}
 
 const handleAnswerImageUrl = (love ) => { 
 setAnswerImageUrl(love)
@@ -85,6 +112,13 @@ const handleQuestionReceived = (love) =>{
 
 
 
+    useEffect(() => { 
+        
+  handleChapterNumber(chapter)
+  handleQuestionNumber(question)
+    },
+
+     [chapter, question]) 
 
 
 
@@ -92,19 +126,24 @@ const handleQuestionReceived = (love) =>{
    
 
     useEffect( () => { 
+      if( !chapterNumber || !questionNumber ){ 
+        return
+      }
         ;(
             async() => { 
                 try {
                     response = await axios.get('http://localhost:8000/user/practice/sat/maths', { 
                         params: {
-                            chapterNumber: chapterNumber, 
-                            questionNumber: questionNumber
+                            chapterNumber: chapterNumber,
+                            questionNumber: questionNumber, 
+                            token : localStorage.getItem("projectMJWT")
                         }
                     })
 
                     if( response === "empty"){ 
                         // some kind of state for failiure
                     }
+                    console.log(`chapter ${chapterNumber} and ${questionNumber}`)
                      //  topic  = questionObject.data.rows[1]
                     console.log(response.data.data.rows[0]) // this is the object which has every attribute of appwrite database satMathKaplan
                     
@@ -115,15 +154,15 @@ const handleQuestionReceived = (love) =>{
 
 
 
-          answerImageLink = storage.getFileView({ 
-            bucketId: response.data.data.rows[0].bucketId,
+          answerImageLink = storage.getFileView({
+            bucketId:response.data.data.rows[0].bucketId ,
             fileId: response.data.data.rows[0].answerImageResponseId, 
           //  width: '620', 
           //   quality: '65', image transformation are blocked on current plan
     
          });
          questionImageLink = storage.getFileView({ 
-            bucketId: response.data.data.rows[0].bucketId, 
+            bucketId: response.data.data.rows[0].bucketId ,
             fileId: response.data.data.rows[0].questionImageResponseId,
           //   width: '620', 
           //   quality: '65', image transformation are blocked on current plan
@@ -151,19 +190,16 @@ const handleQuestionReceived = (love) =>{
         )()
        
 
-    }, [])
+    }, [chapterNumber , questionNumber])
     
     useEffect(() =>{ 
         if( response !== "empty"){
-            HandleQuestionReceived("true")
+            handleQuestionReceived("true")
             
          }
     }, [response]) 
 
-    useEffect(() => { },
-
-     []) 
-
+   
 
 
 
@@ -411,6 +447,25 @@ function Badge({ value, color = "blue" }) {
     }
     return <span className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${colors[color]}`}>{value}</span>
   }
+
+
+
+
+/* 
+  export const QuestionRoute = () => { 
+    
+    const {chapter, question} = useParams()
+
+    return( 
+      <Question chapterNumberParameter = {Number(chapter)}  
+        questionNumberParameter = {Number(question)}
+      /> 
+
+
+    )
+
+  }
+    */
 
 
 

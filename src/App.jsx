@@ -6,6 +6,11 @@ import { PageNotFound } from './pageNotFound.jsx'
 import { GoogleLogin } from './googleLogin.jsx'
 import {GoogleOAuthProvider} from '@react-oauth/google';
 import {Question} from "./pages/question.jsx"
+import { QuestionsPage } from './pages/questionsPage.jsx' 
+import {SectionsPage } from './pages/sectionsPage.jsx'
+import {ChaptersPage} from './pages/chaptersPage.jsx'
+import {LandingPage} from './pages/landingPage.jsx'
+
  // import {QuizWindow} from './pages/questionWindow.jsx'
 
 function App() {
@@ -20,14 +25,17 @@ function App() {
 
     }
   return (
-    <BrowserRouter> 
+    <BrowserRouter>
     <Routes> 
-      <Route path="/login" element={<GoogleAuthWrapper/>}/>
-      <Route path="/" element={<Navigate to="/login"/>}/>
-    <Route path="/dashboard" element={<Dashboard/>} />
-<Route path="/error" element={<PageNotFound/>} />
+      <Route path="/user/login" element={<GoogleAuthWrapper/>}/>
+      <Route path="/" element={<LandingPage />}/>
+  {/*    <Route path="/dashboard" element={<Dashboard/>} />  */} 
+<Route path="*" element={<PageNotFound/>} />
  {/*  <Route path="/user/practice/sat/maths" element={<QuizWindow/>} /> */ } 
- <Route path="/user/questionsolving" element={<Question/>}   />
+ <Route path="/user/practice/sat/maths/:chapter/:question" element={<Question/>}   />
+ <Route path="/user/practice/sat/maths/:chapter"  element={<QuestionsPage/> }   /> 
+ <Route path="/user/practice/sat/maths" element={< ChaptersPage/>} />
+ <Route path="/user/practice/sat" element={< SectionsPage/>} />
       </Routes>
       </BrowserRouter>
   )
